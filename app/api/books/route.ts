@@ -13,25 +13,23 @@ export async function GET(request: NextRequest) {
   const res = await fetch(url);
   const json = await res.json();
 
-  const item = json.items?.[0]?.volumeInfo;
-  const identifiers = json.items?.[0]?.volumeInfo?.industryIdentifiers;
-
-  if (!item) {
+  if (!json.items || json.items.length === 0) {
     return NextResponse.json([], { status: 404 });
   }
 
-  const isbn = identifiers?.[0]?.identifier;
+  const books: Book[] = json.items.slice(0, 10).map((item: any) => {
+    const volumeInfo = item.volumeInfo;
+    const identifiers = volumeInfo.industryIdentifiers;
+    const isbn = identifiers?.[0]?.identifier;
 
-  const googleThumbnail = item.imageLinks?.thumbnail?.replace('http://', 'https://');
-  const openLibCover = isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : null;
+    return {
+      title: volumeInfo.title,
+      authors: volumeInfo.authors || [],
+      pageCount: volumeInfo.pageCount,
+      coverImage: `https://placehold.co/160x240?text=${volumeInfo.title}`,
+      isbn13: isbn,
+    };
+  });
 
-  const book: Book = {
-    title: item.title,
-    authors: item.authors || [],
-    pageCount: item.pageCount,
-    coverImage: googleThumbnail || openLibCover || `https://placehold.co/600x400?text=${encodeURIComponent(item.title)}`,
-    isbn13: isbn,
-  };
-
-  return NextResponse.json([book]);
+  return NextResponse.json(books);
 }
