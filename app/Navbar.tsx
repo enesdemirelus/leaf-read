@@ -2,6 +2,8 @@
 
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SyncUserClient from "../app/SyncUserClient";
+
 import {
   Sheet,
   SheetContent,
@@ -69,7 +71,8 @@ const Navbar = () => {
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton />
+              <SyncUserClient />
             </SignedIn>
           </div>
         </nav>
